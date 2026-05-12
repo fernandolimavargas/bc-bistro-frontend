@@ -53,12 +53,6 @@ function Admin() {
     }
   }
 
-  const refresh = async () => {
-    const dados = await getProdutos();
-
-    setProdutos(dados);
-};
-
   const criar = async (e:React.FormEvent) => { 
     e.preventDefault(); 
     const p = parseFloat(preco.replace(",",".")); 
