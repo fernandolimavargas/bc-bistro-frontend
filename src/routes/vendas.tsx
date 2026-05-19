@@ -26,9 +26,6 @@ function Vendas() {
 
   const [dataInicial, setDataInicial] = useState(hoje);
   const [dataFinal, setDataFinal] = useState(hoje);
-
-  const [pedidoPrint, setPedidoPrint] = useState<any>(null);
-
   useEffect(() => {
     loadVendas();
 }, [dataInicial, dataFinal]);
