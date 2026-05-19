@@ -87,3 +87,18 @@
     letter-spacing: -0.01em;
   }
 }
+
+@media print {
+
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .print-area {
+    width: 80mm;
+    padding: 8px;
+    font-size: 12px;
+  }
+
+}

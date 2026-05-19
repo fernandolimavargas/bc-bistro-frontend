@@ -12,20 +12,36 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VendasRouteImport } from './routes/vendas'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ImprimirRouteImport } from './routes/imprimir.$id'
 
 const VendasRoute = VendasRouteImport.update({
   id: '/vendas',
   path: '/vendas',
   getParentRoute: () => rootRouteImport,
 } as any)
+
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+
+const ImprimirRoute = ImprimirRouteImport.update({
+  id: '/imprimir/$id',
+  path: '/imprimir/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -33,34 +49,68 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/vendas': typeof VendasRoute
+  '/login': typeof LoginRoute
+  '/imprimir/$id': typeof ImprimirRoute
 }
+
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/vendas': typeof VendasRoute
+  '/login': typeof LoginRoute
+  '/imprimir/$id': typeof ImprimirRoute
 }
+
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/vendas': typeof VendasRoute
+  '/login': typeof LoginRoute
+  '/imprimir/$id': typeof ImprimirRoute
 }
+
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/vendas'
+
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/vendas'
+    | '/login'
+    | '/imprimir/$id'
+
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/vendas'
-  id: '__root__' | '/' | '/admin' | '/vendas'
+
+  to:
+    | '/'
+    | '/admin'
+    | '/vendas'
+    | '/login'
+    | '/imprimir/$id'
+
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/vendas'
+    | '/login'
+    | '/imprimir/$id'
+
   fileRoutesById: FileRoutesById
 }
+
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   VendasRoute: typeof VendasRoute
+  LoginRoute: typeof LoginRoute
+  ImprimirRoute: typeof ImprimirRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+
     '/vendas': {
       id: '/vendas'
       path: '/vendas'
@@ -68,6 +118,7 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VendasRouteImport
       parentRoute: typeof rootRouteImport
     }
+
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -75,11 +126,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+
+    '/imprimir/$id': {
+      id: '/imprimir/$id'
+      path: '/imprimir/$id'
+      fullPath: '/imprimir/$id'
+      preLoaderRoute: typeof ImprimirRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -89,7 +157,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   VendasRoute: VendasRoute,
+  LoginRoute: LoginRoute,
+  ImprimirRoute: ImprimirRoute,
 }
+
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()

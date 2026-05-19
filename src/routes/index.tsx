@@ -115,12 +115,26 @@ function Loja() {
     });
 
   const finalizar = async () => {
-    if (itens.length === 0 || loadingVenda) return;
+
+    if (itens.length === 0 || loadingVenda) {
+      return;
+    }
 
     try {
+
       setLoadingVenda(true);
 
-      await addVenda(itens);
+      const venda = await addVenda(itens);
+
+      const dadosImpressao = {
+        id: venda.id,
+        itens,
+        total,
+        data: new Date().toISOString(),
+      };
+
+      sessionStorage.setItem("ultima-impressao", 
+          JSON.stringify(dadosImpressao));
 
       setCarrinho({});
 
@@ -128,11 +142,22 @@ function Loja() {
         description: `Total: ${formatBRL(total)}`,
       });
 
+      window.open(
+        `/imprimir/${venda.id}`,
+        "_blank",
+        "width=400,height=700"
+      );
+
       await loadCatalogo();
+
     } catch {
+
       toast.error("Erro ao finalizar venda");
+
     } finally {
+
       setLoadingVenda(false);
+
     }
   };
 
