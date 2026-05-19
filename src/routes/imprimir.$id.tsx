@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
+import { api } from "../services/api";
+import { PedidoPrint } from "../components/PedidoPrint";
+
 export const Route = createFileRoute("/imprimir/$id")({
   component: Imprimir,
 });
@@ -22,27 +25,23 @@ function Imprimir() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
     carregarVenda();
-
   }, []);
 
-  const carregarVenda = async () => {
+  async function carregarVenda() {
 
     try {
 
-      const response = await fetch(
-        `http://localhost:5000/vendas/reimprimir/${id}`
+      const response = await api.get(
+        `/imprimir/reimprimir/${id}`
       );
 
-      const data = await response.json();
+      console.log(response.data);
 
-      setItens(data);
+      setItens(response.data.dados);
 
       setTimeout(() => {
-
         window.print();
-
       }, 500);
 
     } catch {
@@ -54,7 +53,7 @@ function Imprimir() {
       setLoading(false);
 
     }
-  };
+  }
 
   if (loading) {
     return <div>Carregando...</div>;
@@ -68,43 +67,15 @@ function Imprimir() {
 
   return (
 
-    <div className="print-area">
-
-      <h1>BC Bistro</h1>
-
-      <p>
-        Pedido #{venda.id}
-      </p>
-
-      <p>
-        {new Date(venda.horaVenda).toLocaleString()}
-      </p>
-
-      <hr />
-
-      {itens.map((item, index) => (
-
-        <div key={index}>
-
-          <strong>
-            {item.quantidade}x {item.produto}
-          </strong>
-
-          <div>
-            R$ {item.valorCalculado.toFixed(2)}
-          </div>
-
-        </div>
-
-      ))}
-
-      <hr />
-
-      <h2>
-        Total: R$ {venda.total.toFixed(2)}
-      </h2>
-
-    </div>
+    <PedidoPrint
+      numero={venda.id}
+      total={venda.total}
+      itens={itens.map((item) => ({
+        nome: item.produto,
+        quantidade: item.quantidade,
+        valor: item.valorCalculado,
+      }))}
+    />
 
   );
 }

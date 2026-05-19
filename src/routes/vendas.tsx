@@ -27,6 +27,8 @@ function Vendas() {
   const [dataInicial, setDataInicial] = useState(hoje);
   const [dataFinal, setDataFinal] = useState(hoje);
 
+  const [pedidoPrint, setPedidoPrint] = useState<any>(null);
+
   useEffect(() => {
     loadVendas();
 }, [dataInicial, dataFinal]);
@@ -57,6 +59,12 @@ function Vendas() {
     });
   }, [vendas, filtroProduto]);
 
+function reimprimirVenda(id: number) {
+  window.open(
+    `${window.location.origin}/imprimir/${id}`,
+    "_blank"
+  );
+}
   function baixarExcel() {
 
   const params = new URLSearchParams({
@@ -171,6 +179,11 @@ function Vendas() {
 
                         <div className="font-display text-2xl font-bold">
                           Venda #{venda.id}
+                        </div>
+                        <div>
+                          <button onClick={() => reimprimirVenda(venda.id)} className="mt-2 rounded-lg bg-[color:var(--gold)] px-3 py-1 text-sm font-semibold text-black transition hover:opacity-90">
+                            Reimprimir
+                          </button>
                         </div>
                       </div>
 
