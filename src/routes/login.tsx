@@ -41,10 +41,13 @@ function Login() {
 
     try {
 
-      const session = await login(usuario, senha);
+      const session = await login(
+        usuario,
+        senha
+      );
 
       toast.success(
-        `Bem-vindo(a), ${session.user.nome.split(" ")[0]}!`
+        `Bem-vindo(a), ${session.user.nome}!`
       );
 
       navigate({ to: "/" });
@@ -58,7 +61,9 @@ function Login() {
       );
 
     } finally {
+
       setLoading(false);
+
     }
   };
 
@@ -78,7 +83,7 @@ function Login() {
           </h1>
 
           <p className="text-xs uppercase tracking-widest text-muted-foreground">
-            Bistrô da Igreja
+            Bistrô da Brasa Church
           </p>
 
         </div>
@@ -101,16 +106,14 @@ function Login() {
             <div>
 
               <Label htmlFor="usuario">
-                Usuário ou e-mail
+                Usuário
               </Label>
 
               <Input
                 id="usuario"
                 autoFocus
-                autoComplete="username"
                 value={usuario}
                 onChange={(e) => setUsuario(e.target.value)}
-                placeholder="admin"
               />
 
             </div>
@@ -124,10 +127,8 @@ function Login() {
               <Input
                 id="senha"
                 type="password"
-                autoComplete="current-password"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
-                placeholder="••••••••"
               />
 
             </div>
@@ -143,23 +144,14 @@ function Login() {
               disabled={loading}
               className="w-full bg-yellow-400 text-black hover:bg-yellow-300"
             >
-
               <LogIn className="mr-2 h-4 w-4" />
 
               {loading
                 ? "Entrando..."
                 : "Entrar"}
-
             </Button>
 
           </form>
-
-          <p className="mt-6 text-center text-xs text-muted-foreground">
-            Acesso inicial:
-            <strong> admin </strong>
-            /
-            <strong> admin123 </strong>
-          </p>
 
         </Card>
 
@@ -168,3 +160,5 @@ function Login() {
     </div>
   );
 }
+
+export default Login;
