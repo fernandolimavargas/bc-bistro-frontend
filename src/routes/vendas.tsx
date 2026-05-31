@@ -58,7 +58,7 @@ function Vendas() {
 
 function reimprimirVenda(id: number) {
   window.open(
-    `${window.location.origin}/imprimir/reimprimir/${id}`,
+    `${window.location.origin}/imprimir/${id}`,
     "_blank"
   );
 }
