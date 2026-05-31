@@ -155,11 +155,11 @@ function Loja() {
         description: `Total: ${formatBRL(total)}`,
       });
 
-      window.open(
-        `/imprimir/reimprimir/${venda.id}`,
-        "_blank",
-        "width=400,height=700"
-      );
+      //window.open(
+      //  `/imprimir/reimprimir/${venda.id}`,
+      //  "_blank",
+      //  "width=400,height=700"
+      //);
 
       await loadCatalogo();
 
