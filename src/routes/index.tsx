@@ -45,6 +45,7 @@ function Loja() {
   const [carrinho, setCarrinho] = useState<Record<number, number>>({});
   const [filtro, setFiltro] = useState<Categoria | "Todos">("Todos");
   const [loadingVenda, setLoadingVenda] = useState(false);
+  const [todosProdutos, setTodosProdutos] = useState<Produto[]>([]);
 
   const filtrosCategoria: Record<string, number> = {
     Todos: 0,
@@ -57,6 +58,11 @@ function Loja() {
   const navigate = useNavigate();
 
   const usuario = getCurrentUser();
+
+  useEffect(() => {
+    carregarTodosProdutos();
+  }, []);
+
 
   useEffect(() => {
     loadCatalogo();
@@ -74,11 +80,25 @@ function Loja() {
     }
   }
 
+  async function carregarTodosProdutos() {
+    try {
+
+      const dados = await mostrarCatalogo(0);
+
+      setTodosProdutos(dados);
+
+    } catch {
+
+      toast.error("Erro ao carregar produtos");
+
+    }
+  }
+
   const itens: ItemVenda[] = useMemo(
     () =>
       Object.entries(carrinho)
         .map(([id, qtd]) => {
-          const p = produtos.find((x) => x.id === Number(id));
+          const p = todosProdutos.find((x) => x.id === Number(id));
 
           if (!p || qtd <= 0) return null;
 
@@ -92,7 +112,7 @@ function Loja() {
           };
         })
         .filter(Boolean) as ItemVenda[],
-    [carrinho, produtos]
+    [carrinho, todosProdutos]
   );
 
   const total = itens.reduce(
