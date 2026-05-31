@@ -13,39 +13,92 @@ type Props = {
 export function PedidoPrint({
   numero,
   itens,
-  total,
 }: Props) {
 
   return (
-    <div className="print-area">
+    <div
+      className="mx-auto w-[280px] bg-white p-4 text-black"
+      style={{
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
 
-      <h1>BC Bistro</h1>
+      <div className="text-center">
 
-      <p>Pedido #{numero}</p>
+        <h1
+          style={{
+            fontSize: "28px",
+            fontWeight: "bold",
+            marginBottom: "8px",
+          }}
+        >
+          BC BISTRO
+        </h1>
 
-      <hr />
+        <div
+          style={{
+            borderTop: "2px dashed black",
+            margin: "10px 0",
+          }}
+        />
 
-      {itens.map((item, index) => (
+        <h2
+          style={{
+            fontSize: "24px",
+            fontWeight: "bold",
+            marginBottom: "10px",
+          }}
+        >
+          PEDIDO #{numero}
+        </h2>
 
-        <div key={index}>
+      </div>
 
-          <strong>
-            {item.quantidade}x {item.nome}
-          </strong>
+      <div
+        style={{
+          borderTop: "2px dashed black",
+          margin: "10px 0 20px 0",
+        }}
+      />
 
-          <div>
-            R$ {item.valor.toFixed(2)}
+      <div>
+
+        {itens.map((item, index) => (
+
+          <div
+            key={index}
+            style={{
+              marginBottom: "16px",
+            }}
+          >
+
+            <div
+              style={{
+                fontSize: "24px",
+                fontWeight: "bold",
+                wordBreak: "break-word",
+              }}
+            >
+              {item.quantidade}x {item.nome}
+            </div>
+
           </div>
 
-        </div>
+        ))}
 
-      ))}
+      </div>
 
-      <hr />
-
-      <h2>
-        Total: R$ {total.toFixed(2)}
-      </h2>
+      <div
+        style={{
+          borderTop: "2px dashed black",
+          marginTop: "20px",
+          paddingTop: "10px",
+          textAlign: "center",
+          fontSize: "12px",
+        }}
+      >
+        {new Date().toLocaleString("pt-BR")}
+      </div>
 
     </div>
   );
