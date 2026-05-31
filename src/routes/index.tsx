@@ -156,7 +156,7 @@ function Loja() {
       });
 
       window.open(
-        `/reimprimir/${venda.id}`,
+        `/imprimir/reimprimir/${venda.id}`,
         "_blank",
         "width=400,height=700"
       );
