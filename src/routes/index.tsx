@@ -3,6 +3,13 @@ import { useEffect, useMemo, useState } from "react";
 import { BistroHeader } from "../components/BistroHeader";
 import { Button } from "../components/ui/button";
 import { Card } from "../components/ui/card";
+import { redirect } from "@tanstack/react-router";
+import {
+  isAuthenticated,
+  getCurrentUser,
+  logout
+} from "../lib/bistro-auth";
+import { useNavigate } from "@tanstack/react-router";
 import {
   addVenda,
   formatBRL,
@@ -15,12 +22,14 @@ import { Minus, Plus, ShoppingBag, Trash2, Check } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "BC Bistro — Bistrô da Igreja" },
-      { name: "description", content: "Sistema de vendas do BC Bistro." },
-    ],
-  }),
+  beforeLoad: () => {
+
+    if (!isAuthenticated()) {
+      throw redirect({
+        to: "/login",
+      });
+    }
+  },
   component: Loja,
 });
 
@@ -44,6 +53,10 @@ function Loja() {
     Bebidas: 3,
     Outros: 4,
   };
+
+  const navigate = useNavigate();
+
+  const usuario = getCurrentUser();
 
   useEffect(() => {
     loadCatalogo();
@@ -143,7 +156,7 @@ function Loja() {
       });
 
       window.open(
-        `/imprimir/${venda.id}`,
+        `/reimprimir/${venda.id}`,
         "_blank",
         "width=400,height=700"
       );
@@ -162,10 +175,46 @@ function Loja() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <BistroHeader />
+  <div className="min-h-screen bg-background">
 
-      {loadingVenda && (
+    <BistroHeader />
+
+    <div className="mx-auto flex max-w-6xl justify-end px-4 pt-4">
+
+      <Card className="flex flex-row items-center gap-4 px-4 py-2">
+
+        <div>
+          <div className="text-xs text-muted-foreground">
+            Usuário logado
+          </div>
+
+          <div className="font-semibold">
+            {usuario?.nome}
+          </div>
+        </div>
+
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+
+            logout();
+
+            navigate({
+              to: "/login",
+              replace: true
+            });
+
+          }}
+        >
+          Sair
+        </Button>
+
+      </Card>
+
+    </div>
+
+    {loadingVenda && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-4 rounded-2xl bg-card px-8 py-6 shadow-2xl">
             <div className="h-12 w-12 animate-spin rounded-full border-4 border-[color:var(--gold)] border-t-transparent" />

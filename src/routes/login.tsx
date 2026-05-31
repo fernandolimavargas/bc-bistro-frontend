@@ -25,9 +25,11 @@ function Login() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-
     if (isAuthenticated()) {
-      navigate({ to: "/" });
+      navigate({
+        to: "/",
+        replace: true
+      });
     }
 
   }, [navigate]);
@@ -50,7 +52,10 @@ function Login() {
         `Bem-vindo(a), ${session.user.nome}!`
       );
 
-      navigate({ to: "/" });
+      navigate({
+        to: "/",
+        replace: true
+      });
 
     } catch (err) {
 

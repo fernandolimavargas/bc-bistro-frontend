@@ -1,7 +1,9 @@
+import { api } from "../services/api";
+
 export interface User {
-  id: number;
+  id: number,
   nome: string;
-  email: string;
+  usuario: string;
 }
 
 export interface AuthSession {
@@ -13,7 +15,9 @@ const SESSION_KEY = "bc_bistro_session";
 const isBrowser = () => typeof window !== "undefined";
 
 export function getSession(): AuthSession | null {
-  if (!isBrowser()) return null;
+
+  if (!isBrowser())
+    return null;
 
   const raw = localStorage.getItem(SESSION_KEY);
 
@@ -21,9 +25,28 @@ export function getSession(): AuthSession | null {
     return null;
 
   try {
-    return JSON.parse(raw) as AuthSession;
+
+    const session = JSON.parse(raw);
+
+    // Valida estrutura da sessão
+    if (
+      !session ||
+      !session.user ||
+      typeof session.user.nome !== "string"
+    ) {
+
+      localStorage.removeItem(SESSION_KEY);
+      return null;
+
+    }
+
+    return session as AuthSession;
+
   } catch {
+
+    localStorage.removeItem(SESSION_KEY);
     return null;
+
   }
 }
 
@@ -40,41 +63,42 @@ export async function login(
   senha: string
 ): Promise<AuthSession> {
 
-  const response = await fetch(
-    "https://localhost:5001/api/Login/ExecutarLogin",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
+  try {
+
+    const response = await api.post(
+      "/login/ExecutarLogin",
+      {
         usuario,
         senha
-      })
-    }
-  );
+      }
+    );
 
-  if (!response.ok) {
-    throw new Error("Usuário ou senha inválidos");
+    const session: AuthSession = {
+      user: response.data.usuario
+    };
+
+    localStorage.setItem(
+      SESSION_KEY,
+      JSON.stringify(session)
+    );
+
+    return session;
+
+  } catch {
+
+    throw new Error(
+      "Usuário ou senha inválidos"
+    );
+
   }
-
-  const dados = await response.json();
-
-  const session: AuthSession = {
-    user: dados.usuario
-  };
-
-  localStorage.setItem(
-    SESSION_KEY,
-    JSON.stringify(session)
-  );
-
-  return session;
 }
 
 export function logout() {
+
   if (!isBrowser())
     return;
 
-  localStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(
+    SESSION_KEY
+  );
 }

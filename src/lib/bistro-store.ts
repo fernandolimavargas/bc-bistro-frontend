@@ -2,6 +2,7 @@
 // Replace these functions with real API calls when backend is ready.
 
 import { api } from "../services/api";
+import { getCurrentUser } from "./bistro-auth";
 
 export type Categoria = "Almoços" | "Hambúrgueres" | "Bebidas" | "Outros";
 
@@ -121,12 +122,19 @@ export async function addVenda(
   itens: ItemVenda[]
 ) {
 
+  const usuario = getCurrentUser();
+
+  if (!usuario) {
+    throw new Error("Usuário não autenticado");
+  }
+
   const total = itens.reduce(
     (s, i) => s + i.valorCalculado,
     0
   );
 
   const venda = {
+    idUsuario: usuario.id,
     horaVenda: new Date().toISOString(),
     total,
 
