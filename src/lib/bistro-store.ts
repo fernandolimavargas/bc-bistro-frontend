@@ -12,6 +12,7 @@ export interface Produto {
   preco: number;
   idCategoria: number;
   categoria: string;
+  ativo: boolean
 }
 
 export interface ItemVenda {
@@ -179,6 +180,10 @@ export async function buscarVendas(
   return response.data;
 }
 
+export async function ativarInativarProduto(idProduto: number, ativo: boolean) { 
+  const response = await api.post(`/produto/ativar_inativar?idProduto=${idProduto}&ativo=${ativo}`)
+  return response.data;
+}
 
 
 export const formatBRL = (v: number) =>

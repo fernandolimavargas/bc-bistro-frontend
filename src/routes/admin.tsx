@@ -14,6 +14,7 @@ import {
 } from "../components/ui/select";
 import {
   addProduto,
+  ativarInativarProduto,
   formatBRL,
   getProdutos,
   updateProduto,
@@ -22,6 +23,19 @@ import {
 } from "../lib/bistro-store";
 import { Pencil, Trash2, Save, Plus, X } from "lucide-react";
 import { toast } from "sonner";
+import { Switch } from "../components/ui/switch";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../components/ui/alert-dialog";
+
+import { TriangleAlert } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -39,6 +53,15 @@ function Admin() {
   const [categoria, setCategoria] = useState<Categoria>("Almoços");
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editDraft, setEditDraft] = useState<Partial<Produto>>({});
+  const [openConfirmacao, setOpenConfirmacao] = useState(false);
+  const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(null);
+
+  const categoriaIdMap: Record<Categoria, number> = {
+    "Almoços": 1,
+    "Hambúrgueres": 2,
+    "Bebidas": 3,
+    "Outros": 4,
+  };
 
   useEffect(() =>  { 
     loadProdutos();
@@ -66,7 +89,8 @@ function Admin() {
         produto: nome.trim(),
         preco: p,
         categoria,
-        idCategoria: 0
+        idCategoria: categoriaIdMap[categoria],
+        ativo: true
       });
 
         setNome(""); 
@@ -82,7 +106,7 @@ function Admin() {
 
   const startEdit = (p: Produto) => {
     setEditingId(p.id);
-    setEditDraft({ produto: p.produto, preco: p.preco, categoria: p.categoria });
+    setEditDraft({ produto: p.produto, preco: p.preco, categoria: p.categoria, ativo: p.ativo });
   };
 
 const saveEdit = async (id: number) => {
@@ -92,7 +116,8 @@ const saveEdit = async (id: number) => {
             produto: editDraft.produto ?? "",
             preco: editDraft.preco ?? 0,
             categoria: editDraft.categoria ?? "",
-            idCategoria: editDraft.idCategoria ?? 0
+            idCategoria: categoriaIdMap[editDraft.categoria as Categoria],
+            ativo: editDraft.ativo ?? true
         });
 
         setEditingId(null);
@@ -104,6 +129,36 @@ const saveEdit = async (id: number) => {
     } catch {
         toast.error("Erro ao atualizar produto");
     }
+};
+
+const AtivarInativarProduto = async (id: number, ativo : boolean) => {
+  try { 
+      await ativarInativarProduto(id, ativo);
+    await loadProdutos();
+    toast.success("Produto atualizado");
+  } catch { 
+    toast.error("Erro ao mudar status")
+  }
+}
+
+const confirmarInativacao = async () => {
+  if (!produtoSelecionado) return;
+
+  try {
+    await ativarInativarProduto(
+      produtoSelecionado.id,
+      false
+    );
+
+    await loadProdutos();
+
+    toast.success("Produto inativado");
+
+    setOpenConfirmacao(false);
+    setProdutoSelecionado(null);
+  } catch {
+    toast.error("Erro ao inativar produto");
+  }
 };
 
   return (
@@ -148,6 +203,7 @@ const saveEdit = async (id: number) => {
                   <th className="px-4 py-3 font-semibold">Nome</th>
                   <th className="px-4 py-3 font-semibold">Categoria</th>
                   <th className="px-4 py-3 font-semibold">Preço</th>
+                  <th className="px-4 py-3 font-semibold">Disponível</th>
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
@@ -158,7 +214,7 @@ const saveEdit = async (id: number) => {
                     <tr key={p.id}>
                       <td className="px-4 py-3">
                         {editing ? (
-                          <Input value={editDraft.produto ?? ""} onChange={(e) => setEditDraft((d) => ({ ...d, nome: e.target.value }))} />
+                          <Input value={editDraft.produto ?? ""} onChange={(e) => setEditDraft((d) => ({ ...d, produto: e.target.value }))} />
                         ) : (
                           p.produto
                         )}
@@ -186,6 +242,32 @@ const saveEdit = async (id: number) => {
                           formatBRL(p.preco)
                         )}
                       </td>
+                      <td className="px-4 py-3 font-semibold">
+                        <Switch
+                          checked={p.ativo}
+                          onCheckedChange={async (checked) => {
+
+                            if (!checked) {
+                              setProdutoSelecionado(p);
+                              setOpenConfirmacao(true);
+                              return;
+                            }
+
+                            try {
+                              await ativarInativarProduto(
+                                p.id,
+                                true
+                              );
+
+                              await loadProdutos();
+
+                              toast.success("Produto ativado");
+                            } catch {
+                              toast.error("Erro ao ativar produto");
+                            }
+                          }}
+                        />
+                      </td>
                       <td className="px-4 py-3">
                         <div className="flex justify-end gap-2">
                           {editing ? (
@@ -211,6 +293,35 @@ const saveEdit = async (id: number) => {
           </div>
         </Card>
       </main>
+      <AlertDialog
+        open={openConfirmacao}
+        onOpenChange={setOpenConfirmacao}
+      >
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Deseja inativar este produto?
+            </AlertDialogTitle>
+
+            <AlertDialogDescription>
+              O produto deixará de aparecer no cardápio.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              Cancelar
+            </AlertDialogCancel>
+
+            <AlertDialogAction
+              onClick={confirmarInativacao}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Inativar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
