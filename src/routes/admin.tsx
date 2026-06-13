@@ -88,7 +88,8 @@ function Admin() {
         preco: p,
         categoria,
         idCategoria: categoriaIdMap[categoria],
-        ativo: true
+        ativo: true, 
+        descricao: "",
       });
 
         setNome(""); 
@@ -115,7 +116,8 @@ const saveEdit = async (id: number) => {
             preco: editDraft.preco ?? 0,
             categoria: editDraft.categoria ?? "",
             idCategoria: categoriaIdMap[editDraft.categoria as Categoria],
-            ativo: editDraft.ativo ?? true
+            ativo: editDraft.ativo ?? true,
+            descricao: "",
         });
 
         setEditingId(null);
