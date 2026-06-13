@@ -35,8 +35,6 @@ import {
   AlertDialogTitle,
 } from "../components/ui/alert-dialog";
 
-import { TriangleAlert } from "lucide-react";
-
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [{ title: "Produtos — BC Bistro" }],

@@ -37,7 +37,7 @@ export interface Catalogo {
     preco: number;
     idCategoria: number;
     categoria: string;
-    disponivel: boolean;
+    ativo: boolean;
 }
 
 export interface VendasHistoricos {
