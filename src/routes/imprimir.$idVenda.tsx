@@ -29,10 +29,17 @@ function Imprimir() {
     carregarVenda();
   }, []);
 
+  useEffect(() => {
+    if (itens.length > 0 && !loading) {
+      console.log("Chamando impressão...");
+      setTimeout(() => {
+        window.print();
+      }, 500);
+    }
+  }, [itens, loading]);
+
   async function carregarVenda() {
-
     try {
-
       const response = await api.get(
         `/imprimir/reimprimir/${idVenda}`
       );
@@ -40,10 +47,6 @@ function Imprimir() {
       console.log(response.data);
 
       setItens(response.data.dados);
-
-      setTimeout(() => {
-        window.print();
-      }, 500);
 
     } catch {
 
