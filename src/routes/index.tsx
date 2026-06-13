@@ -178,10 +178,10 @@ function Loja() {
         description: `Total: ${formatBRL(total)}`,
       });
 
-      window.open(
-        `${window.location.origin}/imprimir/${venda.idVenda}`,
-        "_blank"
-      );
+      //window.open(
+        //`${window.location.origin}/imprimir/${venda.idVenda}`,
+        //"_blank"
+      //);
 
       await loadCatalogo();
 
