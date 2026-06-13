@@ -12,7 +12,8 @@ export interface Produto {
   preco: number;
   idCategoria: number;
   categoria: string;
-  ativo: boolean
+  ativo: boolean,
+  descricao: string;
 }
 
 export interface ItemVenda {
@@ -38,6 +39,7 @@ export interface Catalogo {
     idCategoria: number;
     categoria: string;
     ativo: boolean;
+    descricao: string;
 }
 
 export interface VendasHistoricos {

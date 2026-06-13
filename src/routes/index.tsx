@@ -299,7 +299,21 @@ function Loja() {
                       {p.produto}
                     </h3>
 
-                    <div className="mt-2 text-2xl font-bold">
+                    {p.descricao && (
+                      <p
+                        className="
+                          mt-2
+                          text-sm
+                          text-muted-foreground
+                          leading-relaxed
+                          line-clamp-3
+                          min-h-[60px]
+                        "
+                      >
+                        {p.descricao}
+                      </p>)}
+
+                    <div className="mt-3 text-2xl font-bold">
                       {formatBRL(p.preco)}
                     </div>
                   </div>
