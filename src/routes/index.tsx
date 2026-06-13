@@ -34,7 +34,6 @@ export const Route = createFileRoute("/")({
 });
 
 const CATEGORIAS: Categoria[] = [
-  "Almoços",
   "Hambúrgueres",
   "Bebidas",
   "Outros",
