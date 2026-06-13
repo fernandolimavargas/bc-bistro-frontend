@@ -243,27 +243,12 @@ const confirmarInativacao = async () => {
                       <td className="px-4 py-3 font-semibold">
                         <Switch
                           checked={p.ativo}
-                          onCheckedChange={async (checked) => {
-
-                            if (!checked) {
-                              setProdutoSelecionado(p);
-                              setOpenConfirmacao(true);
-                              return;
-                            }
-
-                            try {
-                              await ativarInativarProduto(
-                                p.id,
-                                true
-                              );
-
-                              await loadProdutos();
-
-                              toast.success("Produto ativado");
-                            } catch {
-                              toast.error("Erro ao ativar produto");
-                            }
-                          }}
+                          onCheckedChange={(checked) =>
+                            AtivarInativarProduto(
+                              p.id,
+                              checked
+                            )
+                          }
                         />
                       </td>
                       <td className="px-4 py-3">
