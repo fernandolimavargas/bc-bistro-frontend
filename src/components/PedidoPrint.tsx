@@ -8,11 +8,13 @@ type Props = {
   numero: number;
   itens: Item[];
   total: number;
+  observacao: string;
 };
 
 export function PedidoPrint({
   numero,
   itens,
+  observacao,
 }: Props) {
 
   return (
@@ -87,6 +89,39 @@ export function PedidoPrint({
         ))}
 
       </div>
+
+      {observacao && (
+        <>
+          <div
+            style={{
+              borderTop: "2px dashed black",
+              marginTop: "10px",
+              paddingTop: "10px",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "20px",
+                fontWeight: "bold",
+                textAlign: "center",
+                marginBottom: "8px",
+              }}
+            >
+              ⚠️ OBSERVAÇÕES
+            </div>
+
+            <div
+              style={{
+                fontSize: "16px",
+                whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
+              }}
+            >
+              {observacao}
+            </div>
+          </div>
+        </>
+      )}
 
       <div
         style={{

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { api } from "../services/api";
 import { PedidoPrint } from "../components/PedidoPrint";
 
-export const Route = createFileRoute("/imprimir/$id")({
+export const Route = createFileRoute("/imprimir/$idVenda")({
   component: Imprimir,
 });
 
@@ -15,11 +15,12 @@ type ItemImpressao = {
   quantidade: number;
   valorCalculado: number;
   total: number;
+  observacao: string; 
 };
 
 function Imprimir() {
 
-  const { id } = Route.useParams();
+  const { idVenda } = Route.useParams();
 
   const [itens, setItens] = useState<ItemImpressao[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +34,7 @@ function Imprimir() {
     try {
 
       const response = await api.get(
-        `/imprimir/reimprimir/${id}`
+        `/imprimir/reimprimir/${idVenda}`
       );
 
       console.log(response.data);
@@ -75,6 +76,7 @@ function Imprimir() {
         quantidade: item.quantidade,
         valor: item.valorCalculado,
       }))}
+      observacao={venda.observacao}
     />
 
   );

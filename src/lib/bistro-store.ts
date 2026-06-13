@@ -120,7 +120,8 @@ export async function updateProduto(produto: Produto) {
 }*/
 
 export async function addVenda(
-  itens: ItemVenda[]
+  itens: ItemVenda[],
+  observacao: string
 ) {
 
   const usuario = getCurrentUser();
@@ -146,6 +147,7 @@ export async function addVenda(
       valorCalculado: i.valorCalculado,
       valorTotal: i.valorTotal,
     })),
+    observacao: observacao
   };
 
   const response = await api.post(

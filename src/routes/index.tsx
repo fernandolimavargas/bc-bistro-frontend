@@ -20,6 +20,8 @@ import {
 } from "../lib/bistro-store";
 import { Minus, Plus, ShoppingBag, Trash2, Check } from "lucide-react";
 import { toast } from "sonner";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
 
 export const Route = createFileRoute("/")({
   beforeLoad: () => {
@@ -45,6 +47,7 @@ function Loja() {
   const [filtro, setFiltro] = useState<Categoria | "Todos">("Todos");
   const [loadingVenda, setLoadingVenda] = useState(false);
   const [todosProdutos, setTodosProdutos] = useState<Produto[]>([]);
+  const [observacao, setObservacao] = useState(""); 
 
   const filtrosCategoria: Record<string, number> = {
     Todos: 0,
@@ -156,10 +159,10 @@ function Loja() {
 
       setLoadingVenda(true);
 
-      const venda = await addVenda(itens);
+      const venda = await addVenda(itens, observacao);
 
       const dadosImpressao = {
-        id: venda.id,
+        id: venda.idVenda,
         itens,
         total,
         data: new Date().toISOString(),
@@ -169,16 +172,16 @@ function Loja() {
           JSON.stringify(dadosImpressao));
 
       setCarrinho({});
+      setObservacao("");
 
       toast.success("Venda finalizada!", {
         description: `Total: ${formatBRL(total)}`,
       });
 
-      //window.open(
-      //  `/imprimir/reimprimir/${venda.id}`,
-      //  "_blank",
-      //  "width=400,height=700"
-      //);
+      window.open(
+        `${window.location.origin}/imprimir/${venda.idVenda}`,
+        "_blank"
+      );
 
       await loadCatalogo();
 
@@ -189,7 +192,6 @@ function Loja() {
     } finally {
 
       setLoadingVenda(false);
-
     }
   };
 
@@ -427,6 +429,20 @@ function Loja() {
                 <Check className="mr-2 h-4 w-4" />
                 {loadingVenda ? "Finalizando..." : "Finalizar venda"}
               </Button>
+            </div>
+
+           <div className="border-t border-border p-5">
+              <Label htmlFor="observacao">
+                Observações do pedido
+              </Label>
+
+              <Textarea
+                id="observacao"
+                value={observacao}
+                onChange={(e) => setObservacao(e.target.value)}
+                placeholder=""
+                className="mt-2"
+              />
             </div>
           </Card>
         </aside>

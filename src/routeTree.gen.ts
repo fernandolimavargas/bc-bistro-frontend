@@ -13,7 +13,7 @@ import { Route as VendasRouteImport } from './routes/vendas'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as ImprimirRouteImport } from './routes/imprimir.$id'
+import { Route as ImprimirRouteImport } from './routes/imprimir.$idVenda.tsx'
 
 const VendasRoute = VendasRouteImport.update({
   id: '/vendas',
@@ -40,8 +40,8 @@ const LoginRoute = LoginRouteImport.update({
 } as any)
 
 const ImprimirRoute = ImprimirRouteImport.update({
-  id: '/imprimir/$id',
-  path: '/imprimir/$id',
+  id: '/imprimir/$idVenda',
+  path: '/imprimir/$idVenda',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -50,7 +50,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/vendas': typeof VendasRoute
   '/login': typeof LoginRoute
-  '/imprimir/$id': typeof ImprimirRoute
+  '/imprimir/$idVenda': typeof ImprimirRoute
 }
 
 export interface FileRoutesByTo {
@@ -58,7 +58,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/vendas': typeof VendasRoute
   '/login': typeof LoginRoute
-  '/imprimir/$id': typeof ImprimirRoute
+  '/imprimir/$idVenda': typeof ImprimirRoute
 }
 
 export interface FileRoutesById {
@@ -67,7 +67,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/vendas': typeof VendasRoute
   '/login': typeof LoginRoute
-  '/imprimir/$id': typeof ImprimirRoute
+  '/imprimir/$idVenda': typeof ImprimirRoute
 }
 
 export interface FileRouteTypes {
@@ -78,7 +78,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/vendas'
     | '/login'
-    | '/imprimir/$id'
+    | '/imprimir/$idVenda'
 
   fileRoutesByTo: FileRoutesByTo
 
@@ -87,7 +87,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/vendas'
     | '/login'
-    | '/imprimir/$id'
+    | '/imprimir/$idVenda'
 
   id:
     | '__root__'
@@ -95,7 +95,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/vendas'
     | '/login'
-    | '/imprimir/$id'
+    | '/imprimir/$idVenda'
 
   fileRoutesById: FileRoutesById
 }
@@ -143,10 +143,10 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof rootRouteImport
     }
 
-    '/imprimir/$id': {
-      id: '/imprimir/$id'
-      path: '/imprimir/$id'
-      fullPath: '/imprimir/$id'
+    '/imprimir/$idVenda': {
+      id: '/imprimir/$idVenda'
+      path: '/imprimir/$idVenda'
+      fullPath: '/imprimir/$idVenda'
       preLoaderRoute: typeof ImprimirRouteImport
       parentRoute: typeof rootRouteImport
     }
