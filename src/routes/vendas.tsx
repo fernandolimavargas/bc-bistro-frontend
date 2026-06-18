@@ -5,6 +5,7 @@ import { Card } from "../components/ui/card";
 import {
   buscarVendas,
   formatBRL,
+  reimprimirVenda,
   type VendasHistoricos,
 } from "../lib/bistro-store";
 import { toast } from "sonner";
@@ -56,7 +57,7 @@ function Vendas() {
     });
   }, [vendas, filtroProduto]);
 
-function reimprimirVenda(id: number) {
+function reimprimir(id: number) {
   const response = reimprimirVenda(
     id
   )
@@ -177,7 +178,7 @@ function reimprimirVenda(id: number) {
                           Venda #{venda.id}
                         </div>
                         <div>
-                          <button onClick={() => reimprimirVenda(venda.id)} className="mt-2 rounded-lg bg-[color:var(--gold)] px-3 py-1 text-sm font-semibold text-black transition hover:opacity-90">
+                          <button onClick={() => reimprimir(venda.id)} className="mt-2 rounded-lg bg-[color:var(--gold)] px-3 py-1 text-sm font-semibold text-black transition hover:opacity-90">
                             Reimprimir
                           </button>
                         </div>
