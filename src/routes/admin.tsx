@@ -53,6 +53,7 @@ function Admin() {
   const [editDraft, setEditDraft] = useState<Partial<Produto>>({});
   const [openConfirmacao, setOpenConfirmacao] = useState(false);
   const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(null);
+  const [precoTexto, setPrecoTexto] = useState("");
 
   const categoriaIdMap: Record<Categoria, number> = {
     "Almoços": 1,
@@ -106,6 +107,7 @@ function Admin() {
   const startEdit = (p: Produto) => {
     setEditingId(p.id);
     setEditDraft({ produto: p.produto, preco: p.preco, categoria: p.categoria, ativo: p.ativo });
+    setPrecoTexto(p.preco.toString().replace(".", ","));
   };
 
 const saveEdit = async (id: number) => {
@@ -113,7 +115,7 @@ const saveEdit = async (id: number) => {
         await updateProduto({
             id,
             produto: editDraft.produto ?? "",
-            preco: editDraft.preco ?? 0,
+            preco: parseFloat(precoTexto.replace(",", ".")),
             categoria: editDraft.categoria ?? "",
             idCategoria: categoriaIdMap[editDraft.categoria as Categoria],
             ativo: editDraft.ativo ?? true,
@@ -176,7 +178,7 @@ const confirmarInativacao = async () => {
             </div>
             <div>
               <Label htmlFor="preco">Preço (R$)</Label>
-              <Input id="preco" inputMode="decimal" value={preco} onChange={(e) => setPreco(e.target.value)} placeholder="0,00" />
+              <Input id="preco" inputMode="decimal" value={precoTexto} onChange={(e) => setPreco(e.target.value)} placeholder="0,00" />
             </div>
             <div>
               <Label>Categoria</Label>
