@@ -57,11 +57,20 @@ function Vendas() {
     });
   }, [vendas, filtroProduto]);
 
-function reimprimir(id: number) {
-  const response = reimprimirVenda(
-    id
-  )
-}
+  async function reimprimir(id: number) {
+    try {
+      const response = await reimprimirVenda(id);
+
+      if (response) {
+        toast.success("Venda enviada para impressão");
+      } else {
+        toast.error("Não foi possível imprimir a venda");
+      }
+    } catch {
+      toast.error("Erro ao reimprimir venda");
+    }
+  }
+  
   function baixarExcel() {
 
   const params = new URLSearchParams({
