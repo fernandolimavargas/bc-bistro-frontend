@@ -57,10 +57,9 @@ function Vendas() {
   }, [vendas, filtroProduto]);
 
 function reimprimirVenda(id: number) {
-  window.open(
-    `${window.location.origin}/imprimir/${id}`,
-    "_blank"
-  );
+  const response = reimprimirVenda(
+    id
+  )
 }
   function baixarExcel() {
 
