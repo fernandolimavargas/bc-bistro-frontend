@@ -189,6 +189,13 @@ export async function ativarInativarProduto(idProduto: number, ativo: boolean) {
   return response.data;
 }
 
+export async function reimprimirVenda(
+  idVenda:number, 
+): Promise<Boolean> { 
+  const response = await api.get(`/imprimir/reimprimir/${idVenda}`)
+  return response.data; 
+}
+
 
 export const formatBRL = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
