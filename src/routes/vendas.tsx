@@ -57,9 +57,9 @@ function Vendas() {
     });
   }, [vendas, filtroProduto]);
 
-  async function reimprimir(id: number) {
+  async function reimprimir(idVenda: number) {
     try {
-      const response = await reimprimirVenda(id);
+      const response = await reimprimirVenda(idVenda);
 
       if (response) {
         toast.success("Venda enviada para impressão");
@@ -70,7 +70,7 @@ function Vendas() {
       toast.error("Erro ao reimprimir venda");
     }
   }
-  
+
   function baixarExcel() {
 
   const params = new URLSearchParams({
