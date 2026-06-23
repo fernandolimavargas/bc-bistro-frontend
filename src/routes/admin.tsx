@@ -121,7 +121,7 @@ const saveEdit = async (id: number) => {
             categoria: editDraft.categoria ?? "",
             idCategoria: categoriaIdMap[editDraft.categoria as Categoria],
             ativo: editDraft.ativo ?? true,
-            descricao: editDraft.produto??"",
+            descricao: editDraft.descricao??"",
         });
 
         setEditingId(null);
