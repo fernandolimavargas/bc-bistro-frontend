@@ -54,6 +54,7 @@ function Admin() {
   const [openConfirmacao, setOpenConfirmacao] = useState(false);
   const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(null);
   const [precoTexto, setPrecoTexto] = useState("");
+  const [descricao, setDescricao] = useState("");
 
   const categoriaIdMap: Record<Categoria, number> = {
     "Almoços": 1,
@@ -90,11 +91,12 @@ function Admin() {
         categoria,
         idCategoria: categoriaIdMap[categoria],
         ativo: true, 
-        descricao: "",
+        descricao: descricao.trim(),
       });
 
         setNome(""); 
         setPreco("");
+        setDescricao(""); 
 
         await loadProdutos(); 
         toast.success("Produto Cadastrado");
@@ -106,7 +108,7 @@ function Admin() {
 
   const startEdit = (p: Produto) => {
     setEditingId(p.id);
-    setEditDraft({ produto: p.produto, preco: p.preco, categoria: p.categoria, ativo: p.ativo });
+    setEditDraft({ produto: p.produto, preco: p.preco, categoria: p.categoria, ativo: p.ativo , descricao: p.descricao});
     setPrecoTexto(p.preco.toString().replace(".", ","));
   };
 
@@ -119,7 +121,7 @@ const saveEdit = async (id: number) => {
             categoria: editDraft.categoria ?? "",
             idCategoria: categoriaIdMap[editDraft.categoria as Categoria],
             ativo: editDraft.ativo ?? true,
-            descricao: "",
+            descricao: editDraft.produto??"",
         });
 
         setEditingId(null);
@@ -177,8 +179,18 @@ const confirmarInativacao = async () => {
               <Input id="nome" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex.: Suco de laranja" />
             </div>
             <div>
+              <Label htmlFor="descricao">Descrição</Label>
+              <Input id="descricao" value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Ex.: Feito com laranjas frescas" />
+            </div>
+            <div>
               <Label htmlFor="preco">Preço (R$)</Label>
-              <Input id="preco" inputMode="decimal" value={precoTexto} onChange={(e) => setPreco(e.target.value)} placeholder="0,00" />
+              <Input 
+                id="preco" 
+                inputMode="decimal" 
+                value={preco} // <-- Mudado de precoTexto para preco
+                onChange={(e) => setPreco(e.target.value)} // <-- Atualiza o estado correto
+                placeholder="0,00" 
+              />
             </div>
             <div>
               <Label>Categoria</Label>
@@ -205,6 +217,7 @@ const confirmarInativacao = async () => {
                   <th className="px-4 py-3 font-semibold">Nome</th>
                   <th className="px-4 py-3 font-semibold">Categoria</th>
                   <th className="px-4 py-3 font-semibold">Preço</th>
+                  <th className="px-4 py-3 font-semibold">Descricao</th>
                   <th className="px-4 py-3 font-semibold">Disponível</th>
                   <th className="px-4 py-3"></th>
                 </tr>
@@ -216,9 +229,15 @@ const confirmarInativacao = async () => {
                     <tr key={p.id}>
                       <td className="px-4 py-3">
                         {editing ? (
-                          <Input value={editDraft.produto ?? ""} onChange={(e) => setEditDraft((d) => ({ ...d, produto: e.target.value }))} />
+                          <div className="flex flex-col gap-1.5">
+                            <Input value={editDraft.produto ?? ""} onChange={(e) => setEditDraft((d) => ({ ...d, produto: e.target.value }))} placeholder="Nome do produto" />
+                            <Input value={editDraft.descricao ?? ""} onChange={(e) => setEditDraft((d) => ({ ...d, descricao: e.target.value }))} placeholder="Descrição do produto" className="text-xs" />
+                          </div>
                         ) : (
-                          p.produto
+                          <div>
+                            <div className="font-medium">{p.produto}</div>
+                            {p.descricao && <div className="text-xs text-muted-foreground mt-0.5">{p.descricao}</div>}
+                          </div>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -237,8 +256,8 @@ const confirmarInativacao = async () => {
                         {editing ? (
                           <Input
                             inputMode="decimal"
-                            value={editDraft.preco ?? ""}
-                            onChange={(e) => setEditDraft((d) => ({ ...d, preco: parseFloat(e.target.value.replace(",", ".")) || 0 }))}
+                            value={precoTexto}
+                            onChange={(e) => setPrecoTexto(e.target.value)}
                           />
                         ) : (
                           formatBRL(p.preco)
