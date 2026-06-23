@@ -91,7 +91,7 @@ function Admin() {
         categoria,
         idCategoria: categoriaIdMap[categoria],
         ativo: true, 
-        descricao: descricao.trim(),
+        descricao: descricao,
       });
 
         setNome(""); 
