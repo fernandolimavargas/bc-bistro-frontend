@@ -37,8 +37,9 @@ export const Route = createFileRoute("/")({
 
 const CATEGORIAS: Categoria[] = [
   "Hambúrgueres",
+  "Pizzas",
   "Bebidas",
-  "Outros",
+  "Outros"
 ];
 
 function Loja() {
@@ -55,6 +56,7 @@ function Loja() {
     Hambúrgueres: 2,
     Bebidas: 3,
     Outros: 4,
+    Pizzas: 5
   };
 
   const navigate = useNavigate();

@@ -61,6 +61,7 @@ function Admin() {
     "Hambúrgueres": 2,
     "Bebidas": 3,
     "Outros": 4,
+    "Pizzas": 5,
   };
 
   useEffect(() =>  { 

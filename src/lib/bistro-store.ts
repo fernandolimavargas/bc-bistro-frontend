@@ -4,7 +4,7 @@
 import { api } from "../services/api";
 import { getCurrentUser } from "./bistro-auth";
 
-export type Categoria = "Almoços" | "Hambúrgueres" | "Bebidas" | "Outros";
+export type Categoria = "Almoços" | "Hambúrgueres" | "Pizzas"| "Bebidas" | "Outros";
 
 export interface Produto {
   id: number;
