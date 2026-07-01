@@ -107,7 +107,7 @@ function Loja() {
           if (!p || qtd <= 0) return null;
 
           return {
-            produtoId: p.id,
+            id: p.id,
             produto: p.produto,
             valorUnidade: p.preco,
             valorCalculado: p.preco * qtd,
@@ -396,7 +396,7 @@ function Loja() {
 
               {itens.map((i) => (
                 <div
-                  key={i.produtoId}
+                  key={i.id}
                   className="flex items-center gap-3 px-5 py-3"
                 >
                   <div className="flex-1">
@@ -414,7 +414,7 @@ function Loja() {
                   </div>
 
                   <button
-                    onClick={() => remove(i.produtoId)}
+                    onClick={() => remove(i.id)}
                     className="text-muted-foreground hover:text-destructive"
                     aria-label="Remover"
                     disabled={loadingVenda}

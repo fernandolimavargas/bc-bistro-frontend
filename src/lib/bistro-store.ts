@@ -17,7 +17,7 @@ export interface Produto {
 }
 
 export interface ItemVenda {
-  produtoId: number;
+  id: number;
   produto: string;
   valorUnidade: number; 
   valorCalculado: number;
@@ -40,6 +40,7 @@ export interface Catalogo {
     categoria: string;
     ativo: boolean;
     descricao: string;
+    quantidadeStock: number; 
 }
 
 export interface VendasHistoricos {
@@ -143,6 +144,7 @@ export async function addVenda(
     total,
 
     produtos: itens.map((i) => ({
+      id: i.id, 
       produto: i.produto,
       quantidade: i.quantidade,
       valorUnidade: i.valorUnidade,
