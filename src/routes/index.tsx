@@ -78,7 +78,9 @@ function Loja() {
 
       const dados = await mostrarCatalogo(filtroId);
 
+      console.time("setProdutos");
       setProdutos(dados);
+      console.timeEnd("setProdutos");
     } catch {
       toast.error("Erro ao carregar catálogo");
     }
@@ -192,7 +194,7 @@ function Loja() {
       toast.error("Erro ao finalizar venda");
 
     } finally {
-
+      console.count("Render Loja");
       setLoadingVenda(false);
     }
   };
