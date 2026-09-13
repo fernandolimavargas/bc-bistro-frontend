@@ -22,7 +22,7 @@ import { Minus, Plus, ShoppingBag, Trash2, Check } from "lucide-react";
 import { toast } from "sonner";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
-import { conectarEstoque, desconectarEstoque, ouvirEstoqueAtualizado, testarConexao } from "../lib/estoqueHub";
+import { conectarEstoque, desconectarEstoque, ouvirEstoqueAtualizado } from "../lib/estoqueHub";
 
 export const Route = createFileRoute("/")({
   beforeLoad: () => {
