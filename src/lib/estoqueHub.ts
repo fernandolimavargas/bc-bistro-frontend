@@ -7,7 +7,7 @@ import {
 } from "@microsoft/signalr";
 
 const connection: HubConnection = new HubConnectionBuilder()
-  .withUrl("https://localhost:7151/estoqueHub", {
+  .withUrl("https://bc-bistro-backend-production.up.railway.app/estoqueHub", {
     transport: HttpTransportType.WebSockets,
   })
   .withAutomaticReconnect()
