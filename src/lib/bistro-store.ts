@@ -14,10 +14,12 @@ export interface Produto {
   categoria: string;
   ativo: boolean,
   descricao: string;
+  quantidadeStock: number;
+  disponivel: boolean;
 }
 
 export interface ItemVenda {
-  produtoId: number;
+  id: number;
   produto: string;
   valorUnidade: number; 
   valorCalculado: number;
@@ -40,6 +42,8 @@ export interface Catalogo {
     categoria: string;
     ativo: boolean;
     descricao: string;
+    quantidadeStock: number; 
+    disponivel: boolean;
 }
 
 export interface VendasHistoricos {
@@ -56,6 +60,25 @@ export interface ProdutosVendidos {
   valorUnidade: number;
   quantidade: number;
   valorCalculado: number;
+}
+
+export interface CriarProduto {
+  produto: string;
+  preco: number;
+  idCategoria: number;
+  categoria: string;
+  ativo: boolean;
+  descricao: string;
+}
+
+export interface AtualizarProduto {
+  id: number;
+  produto: string;
+  preco: number;
+  idCategoria: number;
+  categoria: string;
+  ativo: boolean;
+  descricao: string;
 }
 
 
@@ -87,7 +110,7 @@ export async function getProdutos(): Promise<Produto[]> {
   return novo;
 } */
 
-export async function addProduto(produto: Omit<Produto, "id">) { 
+export async function addProduto(produto: Omit<CriarProduto, "id">) { 
   const response = await api.post("/produto/adicionar_produto", produto); 
   return response.data; 
 } 
@@ -97,7 +120,7 @@ export async function addProduto(produto: Omit<Produto, "id">) {
   saveProdutos(all);
 }*/
 
-export async function updateProduto(produto: Produto) { 
+export async function updateProduto(produto: AtualizarProduto) { 
   const response = await api.post("/produto/alterar_produto", produto); 
   return response.data; 
 }
@@ -143,6 +166,7 @@ export async function addVenda(
     total,
 
     produtos: itens.map((i) => ({
+      id: i.id, 
       produto: i.produto,
       quantidade: i.quantidade,
       valorUnidade: i.valorUnidade,
