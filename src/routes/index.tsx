@@ -22,6 +22,7 @@ import { Minus, Plus, ShoppingBag, Trash2, Check } from "lucide-react";
 import { toast } from "sonner";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
+import { conectarEstoque, desconectarEstoque, ouvirEstoqueAtualizado, testarConexao } from "../lib/estoqueHub";
 
 export const Route = createFileRoute("/")({
   beforeLoad: () => {
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/")({
 });
 
 const CATEGORIAS: Categoria[] = [
+  "Almoços",
   "Hambúrgueres",
   "Pizzas",
   "Bebidas",
@@ -43,21 +45,11 @@ const CATEGORIAS: Categoria[] = [
 ];
 
 function Loja() {
-  const [produtos, setProdutos] = useState<Produto[]>([]);
   const [carrinho, setCarrinho] = useState<Record<number, number>>({});
   const [filtro, setFiltro] = useState<Categoria | "Todos">("Todos");
   const [loadingVenda, setLoadingVenda] = useState(false);
   const [todosProdutos, setTodosProdutos] = useState<Produto[]>([]);
   const [observacao, setObservacao] = useState(""); 
-
-  const filtrosCategoria: Record<string, number> = {
-    Todos: 0,
-    Almoços: 1,
-    Hambúrgueres: 2,
-    Bebidas: 3,
-    Outros: 4,
-    Pizzas: 5
-  };
 
   const navigate = useNavigate();
 
@@ -65,24 +57,30 @@ function Loja() {
 
   useEffect(() => {
     carregarTodosProdutos();
+
+    conectarEstoque();
+
+    const removerListener = ouvirEstoqueAtualizado((estoque) => {
+      console.log("📦 Estoque atualizado:", estoque);
+
+      setTodosProdutos((produtosAtuais) =>
+        produtosAtuais.map((produto) =>
+          produto.id === estoque.idProduto
+            ? {
+                ...produto,
+                quantidadeStock: estoque.quantidadeStock,
+                disponivel: estoque.disponivel,
+              }
+            : produto
+        )
+      );
+    });
+
+    return () => {
+      removerListener();
+      desconectarEstoque();
+    };
   }, []);
-
-
-  useEffect(() => {
-    loadCatalogo();
-  }, [filtro]);
-
-  async function loadCatalogo() {
-    try {
-      const filtroId = filtrosCategoria[filtro];
-
-      const dados = await mostrarCatalogo(filtroId);
-
-      setProdutos(dados);
-    } catch {
-      toast.error("Erro ao carregar catálogo");
-    }
-  }
 
   async function carregarTodosProdutos() {
     try {
@@ -97,6 +95,16 @@ function Loja() {
 
     }
   }
+
+  const produtos = useMemo(() => {
+    if (filtro === "Todos") {
+      return todosProdutos;
+    }
+
+    return todosProdutos.filter(
+      (produto) => produto.categoria === filtro
+    );
+  }, [todosProdutos, filtro]);
 
   const itens: ItemVenda[] = useMemo(
     () =>
@@ -124,11 +132,26 @@ function Loja() {
     0
   );
 
-  const add = (id: number) =>
-    setCarrinho((c) => ({
-      ...c,
-      [id]: (c[id] ?? 0) + 1,
-    }));
+  const add = (id: number) => {
+    const produto = todosProdutos.find((p) => p.id === id);
+
+    if (!produto || !produto.disponivel) {
+      return;
+    }
+
+    setCarrinho((c) => {
+      const quantidadeAtual = c[id] ?? 0;
+
+      if (quantidadeAtual >= produto.quantidadeStock) {
+        return c;
+      }
+
+      return {
+        ...c,
+        [id]: quantidadeAtual + 1,
+      };
+    });
+  };
 
   const sub = (id: number) =>
     setCarrinho((c) => {
@@ -184,8 +207,6 @@ function Loja() {
         //`${window.location.origin}/imprimir/${venda.idVenda}`,
         //"_blank"
       //);
-
-      await loadCatalogo();
 
     } catch {
 
@@ -285,84 +306,109 @@ function Loja() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {produtos.map((p) => {
-              const qtd = carrinho[p.id] ?? 0;
+  const qtd = carrinho[p.id] ?? 0;
 
-              return (
-                <Card
-                  key={p.id}
-                  className="group flex flex-col justify-between p-5 transition hover:border-[color:var(--gold)] hover:shadow-md"
-                >
-                  <div>
-                    <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--gold)]">
-                      {p.categoria}
-                    </div>
+  return (
+    <Card
+      key={p.id}
+      className="group flex flex-col justify-between p-5 transition hover:border-[color:var(--gold)] hover:shadow-md"
+    >
+      <div>
+        <div className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--gold)]">
+          {p.categoria}
+        </div>
 
-                    <h3 className="mt-1 font-display text-lg font-semibold leading-snug">
-                      {p.produto}
-                    </h3>
+        <h3 className="mt-1 font-display text-lg font-semibold leading-snug">
+          {p.produto}
+        </h3>
 
-                    {p.descricao && (
-                      <p
-                        className="
-                          mt-2
-                          text-sm
-                          text-muted-foreground
-                          leading-relaxed
-                          line-clamp-3
-                          min-h-[60px]
-                        "
-                      >
-                        {p.descricao}
-                      </p>)}
+        {p.descricao && (
+          <p
+            className="
+              mt-2
+              text-sm
+              text-muted-foreground
+              leading-relaxed
+              line-clamp-3
+              min-h-[60px]
+            "
+          >
+            {p.descricao}
+          </p>
+        )}
 
-                    <div className="mt-3 text-2xl font-bold">
-                      {formatBRL(p.preco)}
-                    </div>
-                  </div>
+        {/* PREÇO */}
+        <div className="mt-3 text-2xl font-bold">
+          {formatBRL(p.preco)}
+        </div>
 
-                  <div className="mt-4 flex items-center justify-between">
-                    {qtd > 0 ? (
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="icon"
-                          variant="outline"
-                          onClick={() => sub(p.id)}
-                          disabled={loadingVenda}
-                        >
-                          <Minus className="h-4 w-4" />
-                        </Button>
+        {/* ESTOQUE */}
+        <div className="mt-1 text-sm">
+          {p.quantidadeStock > 0 ? (
+            <span className="text-muted-foreground">
+              Estoque: {p.quantidadeStock}{" "}
+              {p.quantidadeStock === 1 ? "unidade" : "unidades"}
+            </span>
+          ) : (
+            <span className="font-semibold text-destructive">
+              Esgotado
+            </span>
+          )}
+        </div>
+      </div>
 
-                        <span className="w-6 text-center font-semibold">
-                          {qtd}
-                        </span>
+      <div className="mt-4 flex items-center justify-between">
+        {qtd > 0 ? (
+          <div className="flex items-center gap-2">
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => sub(p.id)}
+              disabled={loadingVenda}
+            >
+              <Minus className="h-4 w-4" />
+            </Button>
 
-                        <Button
-                          size="icon"
-                          variant="outline"
-                          onClick={() => add(p.id)}
-                          disabled={loadingVenda}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">
-                        Disponível
-                      </span>
-                    )}
+            <span className="w-6 text-center font-semibold">
+              {qtd}
+            </span>
 
-                    <Button
-                      onClick={() => add(p.id)}
-                      size="sm"
-                      disabled={loadingVenda}
-                    >
-                      <Plus className="mr-1 h-4 w-4" />
-                      Adicionar
-                    </Button>
-                  </div>
-                </Card>
-              );
-            })}
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => add(p.id)}
+              disabled={
+                loadingVenda ||
+                !p.disponivel ||
+                qtd >= p.quantidadeStock
+              }
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : (
+          <span className="text-xs text-muted-foreground">
+            {p.disponivel ? "Disponível" : "Esgotado"}
+          </span>
+        )}
+
+        <Button
+          onClick={() => add(p.id)}
+          size="sm"
+          disabled={
+            loadingVenda ||
+            !p.disponivel ||
+            p.quantidadeStock <= 0 ||
+            qtd >= p.quantidadeStock
+          }
+        >
+          <Plus className="mr-1 h-4 w-4" />
+          {p.disponivel ? "Adicionar" : "Esgotado"}
+        </Button>
+      </div>
+    </Card>
+    );
+    })}
 
             {produtos.length === 0 && (
               <p className="text-muted-foreground">
