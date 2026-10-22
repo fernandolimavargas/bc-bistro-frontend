@@ -18,10 +18,18 @@ import {
   type ItemVenda,
   type Produto,
 } from "../lib/bistro-store";
-import { Minus, Plus, ShoppingBag, Trash2, Check } from "lucide-react";
+import { Minus, Plus, ShoppingBag, Trash2, Check, Leaf, Printer, PrinterX } from "lucide-react";
 import { toast } from "sonner";
 import { Label } from "../components/ui/label";
 import { Textarea } from "../components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../components/ui/dialog";
 import { conectarEstoque, desconectarEstoque, ouvirEstoqueAtualizado } from "../lib/estoqueHub";
 
 export const Route = createFileRoute("/")({
@@ -48,6 +56,7 @@ function Loja() {
   const [carrinho, setCarrinho] = useState<Record<number, number>>({});
   const [filtro, setFiltro] = useState<Categoria | "Todos">("Todos");
   const [loadingVenda, setLoadingVenda] = useState(false);
+  const [modalImpressaoAberto, setModalImpressaoAberto] = useState(false);
   const [todosProdutos, setTodosProdutos] = useState<Produto[]>([]);
   const [observacao, setObservacao] = useState(""); 
 
@@ -174,17 +183,23 @@ function Loja() {
       return next;
     });
 
-  const finalizar = async () => {
+  const finalizar = () => {
 
     if (itens.length === 0 || loadingVenda) {
       return;
     }
 
+    setModalImpressaoAberto(true);
+  };
+
+  const setJaImpresso = async (impresso: boolean) => {
+    if (itens.length === 0 || loadingVenda) return;
+
     try {
 
       setLoadingVenda(true);
 
-      const venda = await addVenda(itens, observacao);
+      const venda = await addVenda(itens, observacao, impresso);
 
       const dadosImpressao = {
         id: venda.idVenda,
@@ -198,6 +213,7 @@ function Loja() {
 
       setCarrinho({});
       setObservacao("");
+      setModalImpressaoAberto(false);
 
       toast.success("Venda finalizada!", {
         description: `Total: ${formatBRL(total)}`,
@@ -213,7 +229,6 @@ function Loja() {
       toast.error("Erro ao finalizar venda");
 
     } finally {
-      console.count("Render Loja");
       setLoadingVenda(false);
     }
   };
@@ -222,6 +237,56 @@ function Loja() {
   <div className="min-h-screen bg-background">
 
     <BistroHeader />
+
+    <Dialog
+      open={modalImpressaoAberto}
+      onOpenChange={(aberto) => !loadingVenda && setModalImpressaoAberto(aberto)}
+    >
+      <DialogContent className="sm:max-w-xl">
+        <DialogHeader>
+          <DialogTitle className="font-display text-2xl">
+            Deseja imprimir o comprovante?
+          </DialogTitle>
+          <DialogDescription>
+            A venda é registrada de qualquer forma. Imprima o papel só quando o cliente
+            realmente for levar.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="rounded-lg border border-border bg-muted/50 px-4 py-3">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">
+              {itens.reduce((s, i) => s + i.quantidade, 0)}{" "}
+              {itens.reduce((s, i) => s + i.quantidade, 0) === 1 ? "item" : "itens"}
+            </span>
+            <span className="font-display text-xl font-bold">{formatBRL(total)}</span>
+          </div>
+          <div className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Leaf className="h-3.5 w-3.5 text-[color:var(--gold)]" />
+            Sem impressão você economiza papel — o histórico continua em Vendas.
+          </div>
+        </div>
+
+        <DialogFooter className="gap-2 sm:justify-between">
+          <Button
+            variant="outline"
+            onClick={() => setJaImpresso(true)}
+            disabled={loadingVenda}
+            className="w-full sm:w-auto"
+          >
+            <PrinterX className="mr-2 h-4 w-4" /> Não imprimir
+          </Button>
+          <Button
+            onClick={() => setJaImpresso(false)}
+            disabled={loadingVenda}
+            className="w-full bg-[color:var(--gold)] text-foreground hover:bg-[color:var(--gold)]/90 sm:w-auto"
+          >
+            <Printer className="mr-2 h-4 w-4" />
+            {loadingVenda ? "Finalizando..." : "Imprimir comprovante"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
 
     <div className="mx-auto flex max-w-6xl justify-end px-4 pt-4">
 
