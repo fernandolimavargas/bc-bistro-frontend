@@ -148,7 +148,7 @@ export async function updateProduto(produto: AtualizarProduto) {
 export async function addVenda(
   itens: ItemVenda[],
   observacao: string,
-  impresso: boolean
+  imprimir: boolean
 ) {
 
   const usuario = getCurrentUser();
@@ -166,7 +166,7 @@ export async function addVenda(
     idUsuario: usuario.id,
     horaVenda: new Date().toISOString(),
     total,
-    impresso,
+    imprimir,
 
     produtos: itens.map((i) => ({
       id: i.id, 

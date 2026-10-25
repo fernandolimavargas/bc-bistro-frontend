@@ -270,14 +270,14 @@ function Loja() {
         <DialogFooter className="gap-2 sm:justify-between">
           <Button
             variant="outline"
-            onClick={() => setJaImpresso(true)}
+            onClick={() => setJaImpresso(false)}
             disabled={loadingVenda}
             className="w-full sm:w-auto"
           >
             <PrinterX className="mr-2 h-4 w-4" /> Não imprimir
           </Button>
           <Button
-            onClick={() => setJaImpresso(false)}
+            onClick={() => setJaImpresso(true)}
             disabled={loadingVenda}
             className="w-full bg-[color:var(--gold)] text-foreground hover:bg-[color:var(--gold)]/90 sm:w-auto"
           >
