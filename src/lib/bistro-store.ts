@@ -75,6 +75,7 @@ export interface AtualizarProduto {
   id: number;
   produto: string;
   preco: number;
+  quantidadeStock: number;
   idCategoria: number;
   categoria: string;
   ativo: boolean;

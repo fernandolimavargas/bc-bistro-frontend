@@ -54,6 +54,7 @@ function Admin() {
   const [openConfirmacao, setOpenConfirmacao] = useState(false);
   const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(null);
   const [precoTexto, setPrecoTexto] = useState("");
+  const [estoqueTexto, setEstoqueTexto] = useState("");
   const [descricao, setDescricao] = useState("");
 
   const categoriaIdMap: Record<Categoria, number> = {
@@ -109,16 +110,30 @@ function Admin() {
 
   const startEdit = (p: Produto) => {
     setEditingId(p.id);
-    setEditDraft({ produto: p.produto, preco: p.preco, categoria: p.categoria, ativo: p.ativo , descricao: p.descricao});
+    setEstoqueTexto(String(p.quantidadeStock ?? 0));
+    setEditDraft({
+      produto: p.produto,
+      preco: p.preco,
+      categoria: p.categoria,
+      ativo: p.ativo,
+      descricao: p.descricao,
+    });
     setPrecoTexto(p.preco.toString().replace(".", ","));
   };
 
 const saveEdit = async (id: number) => {
+    const quantidadeStock = Number(estoqueTexto);
+    if (estoqueTexto === "" || !Number.isInteger(quantidadeStock) || quantidadeStock < 0) {
+      toast.error("Informe uma quantidade de estoque válida");
+      return;
+    }
+
     try {
         await updateProduto({
             id,
             produto: editDraft.produto ?? "",
             preco: parseFloat(precoTexto.replace(",", ".")),
+            quantidadeStock,
             categoria: editDraft.categoria ?? "",
             idCategoria: categoriaIdMap[editDraft.categoria as Categoria],
             ativo: editDraft.ativo ?? true,
@@ -127,6 +142,7 @@ const saveEdit = async (id: number) => {
 
         setEditingId(null);
         setEditDraft({});
+        setEstoqueTexto("");
 
         await loadProdutos();
 
@@ -218,7 +234,8 @@ const confirmarInativacao = async () => {
                   <th className="px-4 py-3 font-semibold">Nome</th>
                   <th className="px-4 py-3 font-semibold">Categoria</th>
                   <th className="px-4 py-3 font-semibold">Preço</th>
-                  <th className="px-4 py-3 font-semibold">Descricao</th>
+                  <th className="px-4 py-3 font-semibold">Descrição</th>
+                  <th className="px-4 py-3 font-semibold">Estoque</th>
                   <th className="px-4 py-3 font-semibold">Disponível</th>
                   <th className="px-4 py-3"></th>
                 </tr>
@@ -230,15 +247,9 @@ const confirmarInativacao = async () => {
                     <tr key={p.id}>
                       <td className="px-4 py-3">
                         {editing ? (
-                          <div className="flex flex-col gap-1.5">
-                            <Input value={editDraft.produto ?? ""} onChange={(e) => setEditDraft((d) => ({ ...d, produto: e.target.value }))} placeholder="Nome do produto" />
-                            <Input value={editDraft.descricao ?? ""} onChange={(e) => setEditDraft((d) => ({ ...d, descricao: e.target.value }))} placeholder="Descrição do produto" className="text-xs" />
-                          </div>
+                          <Input value={editDraft.produto ?? ""} onChange={(e) => setEditDraft((d) => ({ ...d, produto: e.target.value }))} placeholder="Nome do produto" />
                         ) : (
-                          <div>
-                            <div className="font-medium">{p.produto}</div>
-                            {p.descricao && <div className="text-xs text-muted-foreground mt-0.5">{p.descricao}</div>}
-                          </div>
+                          <div className="font-medium">{p.produto}</div>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -264,7 +275,32 @@ const confirmarInativacao = async () => {
                           formatBRL(p.preco)
                         )}
                       </td>
-                      <td className="px-4 py-3 font-semibold">
+                      <td className="px-4 py-3">
+                        {editing ? (
+                          <Input
+                            value={editDraft.descricao ?? ""}
+                            onChange={(e) => setEditDraft((d) => ({ ...d, descricao: e.target.value }))}
+                            placeholder="Descrição do produto"
+                          />
+                        ) : (
+                          <span>{p.descricao || "—"}</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {editing ? (
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            aria-label={`Estoque de ${p.produto}`}
+                            value={estoqueTexto}
+                            onChange={(e) => setEstoqueTexto(e.target.value.replace(/\D/g, ""))}
+                          />
+                        ) : (
+                          <span>{p.quantidadeStock ?? 0} unidades</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
                         <Switch
                           checked={p.ativo}
                           onCheckedChange={(checked) => {
